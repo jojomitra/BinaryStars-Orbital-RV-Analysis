@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 # Raw GitHub URL to your committed orb6.txt (replace USER/REPO/BRANCH as needed)
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/mtalafha90/Input_tutorials_RV_Orbits/main/orb6.txt"
+GITHUB_RAW_URL = "https://github.com/jojomitra/BinaryStars-Orbital-RV-Analysis/blob/main/orb6.txt"
 LOCAL_FILE    = "orb6.txt"
 
 def update_orb6_file():
