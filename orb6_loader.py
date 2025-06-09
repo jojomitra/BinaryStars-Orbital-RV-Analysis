@@ -3,7 +3,9 @@
 import pandas as pd
 import os
 
-LOCAL_FILE = "orb6.txt"
+# Always look for orb6.txt next to this script:
+THIS_DIR   = os.path.dirname(os.path.abspath(__file__))
+LOCAL_FILE = os.path.join(THIS_DIR, "orb6.txt")
 
 def fetch_orb6_lines():
     """
