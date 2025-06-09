@@ -1,5 +1,3 @@
-Sixth Catalog of Orbits of Visual Binary Stars: Orbital Elements
-                                                                                      
 RA,Dec (J2000).... WDS....... DD............ HD....   V1...* ppppp.pppppp*  aaa.aaaaa*  iii.iiii  OOO.OOOO*  TTTTT.TTTTTT*  e.eeeeee  ooo.oooo  EQNX  G N P E  REF.....
                               ADS .....      HIP...   V2...*      +/-          +/-        +/-       +/-          +/-          +/-       +/-     LAST                   
 000000.91-192955.8 00000-1930 LTT 9831       224690    9.0     499.7989  d   14.31   a  118.06     77.28     48397.3164  d  0.0000      0.00          9 N P E  HIP1997d
