@@ -9,6 +9,16 @@ import sys
 import os
 
 from rv_orbital_fitting_with_advanced_gui import readinp, readcsv_custom, fitorb, orbsave, orbplot_streamlit, orb
+from orb6_loader import parse_orb6_table
+
+# --- Load & cache the live ORB6 catalog (including StarRef) ---
+@st.cache_data(show_spinner=False)
+def load_published_orbits():
+    df = parse_orb6_table()
+    return df.set_index("StarRef", drop=False)
+
+published_df = load_published_orbits()
+
 
 # --- Redirect stdout to display logs ---
 class StreamlitRedirect(io.StringIO):
@@ -30,6 +40,36 @@ st.markdown("""Python Implementation of Tokovinin’s original OrbitX code which
             
             """)
 st.markdown("Upload a `.inp or.csv` file and run the orbital fitting process below.")
+
+# --- Step 0: Optionally overlay a published ORB6 orbit ------------
+st.subheader("Step 0: Overlay a published ORB6 orbit (optional)")
+
+starref_list = [""] + published_df["StarRef"].tolist()
+selected_starref = st.selectbox("Pick a published REF code from ORB6:", starref_list)
+
+if selected_starref:
+    row = published_df.loc[selected_starref]
+    starid = row["StarID"]
+    el_old = np.zeros(10)
+    el_old[0] = float(row["P"])
+    el_old[1] = float(row["T"])
+    el_old[2] = float(row["e"])
+    el_old[3] = float(row["a"])
+    el_old[4] = float(row["Omega"])
+    el_old[5] = float(row["omega"])
+    el_old[6] = float(row["i"])
+    el_old[7:10] = 0.0   # no published RV data, so K1=K2=V0=0
+
+    st.markdown(
+        f"Overlaying published orbit for **REF {selected_starref}** (WDS {starid})<br>"
+        f"P={el_old[0]:.4f}, T={el_old[1]:.4f}, e={el_old[2]:.4f}, a={el_old[3]:.4f},<br>"
+        f"Ω={el_old[4]:.2f}, ω={el_old[5]:.2f}, i={el_old[6]:.2f}",
+        unsafe_allow_html=True
+    )
+else:
+    el_old = None
+
+# --- End Step 0 ---------------------------------------------------
 
 
 # --- Input file selection ---
@@ -99,7 +139,7 @@ if (uploaded_file or selected_example) and run:
                 st.subheader("Process Output Log")
                 st.text(buffer.output)
                 st.subheader("Visual Orbit")
-                figs = orbplot_streamlit()
+                figs = orbplot_streamlit(el_old=el_old)
                 for fig in figs:
                     st.pyplot(fig)
             except Exception as e:
