@@ -1,57 +1,75 @@
 # orb6_loader.py
 
-import requests
-from bs4 import BeautifulSoup
 import pandas as pd
 import os
 
-# Raw GitHub URL to your committed orb6.txt (replace USER/REPO/BRANCH as needed)
-GITHUB_RAW_URL = "https://github.com/jojomitra/BinaryStars-Orbital-RV-Analysis/blob/main/orb6.txt"
-LOCAL_FILE    = "orb6.txt"
-
-def update_orb6_file():
-    """
-    Attempt to fetch orb6.txt from your GitHub repo (raw URL) and overwrite local file.
-    """
-    try:
-        resp = requests.get(GITHUB_RAW_URL, timeout=10)
-        resp.raise_for_status()
-    except Exception:
-        return
-
-    with open(LOCAL_FILE, "w", encoding="utf-8") as f:
-        f.write(resp.text)
+LOCAL_FILE = "orb6.txt"
 
 def fetch_orb6_lines():
+    """
+    Read the committed 'orb6.txt' from disk.
+    Return a list of lines (strings), or [] if missing.
+    """
     if not os.path.exists(LOCAL_FILE):
         return []
     with open(LOCAL_FILE, "r", encoding="utf-8") as f:
         return f.read().splitlines()
 
 def parse_orb6_table():
+    """
+    Parse the fixed-width ORB6 lines into a DataFrame
+    with columns ['StarID','P','T','e','a','Omega','omega','i','StarRef'].
+
+    If 'orb6.txt' is missing or empty, return an empty DataFrame
+    with those exact columns.
+    """
     lines = fetch_orb6_lines()
     if not lines:
-        return pd.DataFrame(
-            columns=["StarID","P","T","e","a","Omega","omega","i","StarRef"]
-        )
+        return pd.DataFrame(columns=[
+            "StarID","P","T","e","a","Omega","omega","i","StarRef"
+        ])
+
+    # Keep only lines that start with a digit (actual data entries)
     data_lines = [L for L in lines if L and L[0].isdigit()]
+
+    # Fixed‐width column specs (0-based indices) and names:
     colspecs = [
-        (19, 28), (50, 62), (122,133), (142,148),
-        (78, 84), (107,112), (157,162), (93, 98), (176,200)
+        (19, 28),    # WDS designation → StarID
+        (50, 62),    # P (period, days)
+        (122,133),   # T (time of periastron, JD)
+        (142,148),   # e (eccentricity)
+        (78,  84),   # a (semimajor axis, arcsec)
+        (107,112),   # Omega (ascending node, deg)
+        (157,162),   # omega (argument of periastron, deg)
+        (93,  98),   # i (inclination, deg)
+        (176,200)    # StarRef (reference code)
     ]
-    names = ["StarID","P","T","e","a","Omega","omega","i","StarRef"]
+    names = [
+        "StarID","P","T","e","a","Omega","omega","i","StarRef"
+    ]
+
     df = pd.read_fwf(
         pd.io.common.StringIO("\n".join(data_lines)),
-        colspecs=colspecs, names=names
+        colspecs=colspecs,
+        names=names
     )
-    df["StarID"]  = df["StarID"].str.strip()
+
+    # Strip whitespace from the two string columns
+    df["StarID"] = df["StarID"].str.strip()
     df["StarRef"] = df["StarRef"].str.strip()
+
+    # Convert numeric columns to floats (coerce on parse errors)
     for col in ["P","T","e","a","Omega","omega","i"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
-    df = df.dropna(subset=["StarID","P","T","e","a","Omega","omega","i","StarRef"])
+
+    # Drop any rows missing required fields
+    df = df.dropna(subset=[
+        "StarID","P","T","e","a","Omega","omega","i","StarRef"
+    ])
     return df.reset_index(drop=True)
 
+
 if __name__ == "__main__":
-    update_orb6_file()
     catalog = parse_orb6_table()
-    print(f"Loaded {len(catalog)} orbits.")
+    print(f"Loaded {len(catalog)} orbits from orb6.txt")
+    print(catalog.head())
