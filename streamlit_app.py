@@ -53,6 +53,7 @@ else:
 
     if selected_starref:
         row = published_df.loc[selected_starref]
+        starid = row["StarID"]
         el_old = np.zeros(10)
         el_old[0] = float(row["P"])
         el_old[1] = float(row["T"])
@@ -61,9 +62,10 @@ else:
         el_old[4] = float(row["Omega"])
         el_old[5] = float(row["omega"])
         el_old[6] = float(row["i"])
-        el_old[7:10] = 0.0
+        el_old[7:10] = 0.0   # no published RV data → K1=K2=V0=0
+
         st.markdown(
-            f"Overlaying published orbit for **REF {selected_starref}** (WDS {row['StarID']})<br>"
+            f"Overlaying published orbit for **REF {selected_starref}** (WDS {starid})<br>"
             f"P={el_old[0]:.4f}, T={el_old[1]:.4f}, e={el_old[2]:.4f}, a={el_old[3]:.4f},<br>"
             f"Ω={el_old[4]:.2f}, ω={el_old[5]:.2f}, i={el_old[6]:.2f}",
             unsafe_allow_html=True
