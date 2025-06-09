@@ -31,8 +31,8 @@ def parse_orb6_table():
             "StarID","P","T","e","a","Omega","omega","i","StarRef"
         ])
 
-    # Keep only lines that start with a digit (actual data entries)
-    data_lines = [L for L in lines if L and L[0].isdigit()]
+    # Keep only lines that start (after any whitespace) with a digit
+    data_lines = [L for L in lines if L.lstrip() and L.lstrip()[0].isdigit()]
 
     # Fixed‐width column specs (0-based indices) and names:
     colspecs = [
