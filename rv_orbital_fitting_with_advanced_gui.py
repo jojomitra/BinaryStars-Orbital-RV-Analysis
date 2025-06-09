@@ -218,6 +218,8 @@ def readcsv_custom(fname):
         correct(orb.pos, orb.el[1])
 
     orb.graph['mode'] = 1 if (krv1 > 0 or krv2 > 0) else 0
+    # HM: ─── save the *initial* elements for later overlay & printing ───
+    orb.initial_el = orb.el.copy()
 
 def readinp(fname):
     global orb
@@ -288,6 +290,8 @@ def readinp(fname):
     orb.obj['nrv2'] = krv2
     orb.elerr = np.zeros(10)
     orb.graph['mode'] = 1 if (krv1 > 0 or krv2 > 0) else 0
+    # HM:─── save the *initial* elements for later overlay & printing ───
+    orb.initial_el = orb.el.copy()
     # Modifed by M.H. TALAFHA 20/05/2025
     # If radial velocities are not included in the data file, you have to fix some paramters to ensure perfect fitting
     # We have 10 parameters 'P', 'T', 'e', 'a', 'W', 'w', 'i', 'K1', 'K2', 'V0'
@@ -313,6 +317,11 @@ def orbplot_streamlit():
         xobs = -orb.pos[:, 2] * np.sin(orb.pos[:, 1] / gr)
         yobs = orb.pos[:, 2] * np.cos(orb.pos[:, 1] / gr)
         xy0 = eph(orb.el, orb.pos[:, 0])
+        
+        # HM:─── overlay the *initial* orbit in red dotted ───
+        xye_init = eph(orb.initial_el, time)
+        ax.plot(-xye_init[:, 1], xye_init[:, 0], 'r:', label='Initial Orbit')
+        # ─── now plot the fitted orbit ───
 
         ax.plot(-xye[:, 1], xye[:, 0], 'k-', label='Orbit')
         ax.plot(xobs, yobs, 'bs', label='Observations')
@@ -385,6 +394,10 @@ def orbplot(ps=False):
         xobs = -orb.pos[:, 2] * np.sin(orb.pos[:, 1] / gr)
         yobs = orb.pos[:, 2] * np.cos(orb.pos[:, 1] / gr)
         xy0 = eph(orb.el, orb.pos[:, 0])
+        # HM:─── overlay the *initial* orbit in red dotted ───
+        xye_init = eph(orb.initial_el, time)
+        plt.plot(-xye_init[:, 1], xye_init[:, 0], 'r:', label='Initial Orbit')
+        # ─── now plot the fitted orbit ───
 
         plt.plot(-xye[:, 1], xye[:, 0], 'k-', label='Orbit')
         plt.plot(xobs, yobs, 'bs', label='Observations')
@@ -576,6 +589,14 @@ def fitorb(rms_only=False):
     print("CHI2/N:", [f"{val:.4f}" for val in normchi2])
     formatted = ", ".join(f"{val:.4f}" for val in wrms)
     print(f"RMS (Theta, rho, RV1, RV2): {formatted}")
+    # HM:─── print the *initial* seven elements from the input file ───
+    print("\nInitial Parameters (from input file):")
+    for i in range(7):
+        nm = orb.elname[i]
+        val = orb.initial_el[i]
+        print(f"{nm:<5}: {val:>10.4f}")
+    # ─── now the fitted values and errors ───
+
     print("\nFitted Parameters and Errors:")
     for i, idx in enumerate(selfit):
         print(f"{orb.elname[idx]:<5}: {orb.el[idx]:>10.4f} ± {orb.elerr[idx]:.4f}")
