@@ -298,18 +298,43 @@ def readinp(fname):
     #  print("No RV data, fixing K1, K2, V0")
 
 # Orbit plotting
-def orbplot_streamlit():
+def orbplot_streamlit(el_old=None):
+    """
+    HM: If el_old is a length-10 array, plot its visual orbit (in red-dotted)
+    before plotting the newly-fitted orbit.
+    """
     import matplotlib.pyplot as plt
     figs = []
     name = orb.obj['fname'].split('.')[0]
 
     gr = 180 / np.pi
 
+    # HM: --- Overlay the published (old) orbit if el_old is provided ---
+    if el_old is not None and orb.obj['npos'] > 0:
+        # Sample 200 points over one period of the old elements:
+        t_old = np.linspace(0, el_old[0], 200) + el_old[1]
+        xy_old = eph(el_old, t_old, rho=True)  # each row = [theta_old, rho_old]
+
+        theta_old = xy_old[:, 0] * np.pi / 180.0
+        rho_old   = xy_old[:, 1]
+        x_old = -rho_old * np.sin(theta_old)   # east (negative)
+        y_old =  rho_old * np.cos(theta_old)   # north (positive)
+
+        fig_old, ax_old = plt.subplots(figsize=(6, 6))
+        ax_old.plot(x_old, y_old, 'r--', label='Published orbit (ORB6)')
+        ax_old.plot([0], [0], 'r*', markersize=8)
+        ax_old.set_xlabel('X, arcsec (East)')
+        ax_old.set_ylabel('Y, arcsec (North)')
+        ax_old.set_title(f"Published Orbit: {orb.obj['name']}")
+        ax_old.axis('equal')
+        ax_old.legend()
+        figs.append(fig_old)
+    
     # --- Visual Orbit Plot ---
     if orb.obj['npos'] > 0:
         fig, ax = plt.subplots(figsize=(6, 6))
         time = np.linspace(0, orb.el[0], 100) + orb.el[1]
-        xye = eph(orb.el, time)
+        xye = eph(orb.el, t_new)
         xobs = -orb.pos[:, 2] * np.sin(orb.pos[:, 1] / gr)
         yobs = orb.pos[:, 2] * np.cos(orb.pos[:, 1] / gr)
         xy0 = eph(orb.el, orb.pos[:, 0])
