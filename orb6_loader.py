@@ -58,9 +58,12 @@ def parse_orb6_table():
     )
 
     # Strip whitespace from the two string columns
-    df["StarID"] = df["StarID"].str.strip()
-    df["StarRef"] = df["StarRef"].str.strip()
+    df["StarID"] = df["StarID"].astype(str).str.strip()
+    df["StarRef"] = df["StarRef"].astype(str).str.strip()
 
+    # Remove rows with blank StarRef
+    df = df[df["StarRef"].str.len() > 0]
+    
     # Convert numeric columns to floats (coerce on parse errors)
     for col in ["P","T","e","a","Omega","omega","i"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
