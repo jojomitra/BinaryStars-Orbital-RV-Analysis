@@ -3,19 +3,22 @@
 import pandas as pd
 import os
 
-# Always look for orb6.txt next to this script:
+# 1) Compute the folder where this file (orb6_loader.py) lives:
 THIS_DIR   = os.path.dirname(os.path.abspath(__file__))
+# 2) Always look for orb6.txt in that same folder:
 LOCAL_FILE = os.path.join(THIS_DIR, "orb6.txt")
+
 
 def fetch_orb6_lines():
     """
-    Read the committed 'orb6.txt' from disk.
+    Read the committed 'orb6.txt' from disk (next to this script).
     Return a list of lines (strings), or [] if missing.
     """
     if not os.path.exists(LOCAL_FILE):
         return []
     with open(LOCAL_FILE, "r", encoding="utf-8") as f:
         return f.read().splitlines()
+
 
 def parse_orb6_table():
     """
@@ -28,27 +31,25 @@ def parse_orb6_table():
     lines = fetch_orb6_lines()
     if not lines:
         return pd.DataFrame(columns=[
-            "StarID","P","T","e","a","Omega","omega","i","StarRef"
+            "StarID", "P", "T", "e", "a", "Omega", "omega", "i", "StarRef"
         ])
 
-    # Keep only lines that start with a digit (actual data entries)
-    data_lines = [L for L in lines if L and L[0].isdigit()]
+    # Keep only lines whose first non-whitespace character is a digit
+    data_lines = [L for L in lines if L.lstrip() and L.lstrip()[0].isdigit()]
 
-    # Fixed‐width column specs (0-based indices) and names:
+    # Fixed-width column specs (0-based indices) and names:
     colspecs = [
-        (19, 28),    # WDS designation → StarID
-        (50, 62),    # P (period, days)
-        (122,133),   # T (time of periastron, JD)
-        (142,148),   # e (eccentricity)
-        (78,  84),   # a (semimajor axis, arcsec)
-        (107,112),   # Omega (ascending node, deg)
-        (157,162),   # omega (argument of periastron, deg)
-        (93,  98),   # i (inclination, deg)
-        (176,200)    # StarRef (reference code)
+        (19, 28),    # WDS → StarID
+        (50, 62),    # P  (period, days)
+        (122,133),   # T  (time of periastron, JD)
+        (142,148),   # e  (eccentricity)
+        (78,  84),   # a  (semimajor axis, arcsec)
+        (107,112),   # Omega  (ascending node, deg)
+        (157,162),   # omega  (argument of periastron, deg)
+        (93,  98),   # i  (inclination, deg)
+        (176,200)    # StarRef  (reference code)
     ]
-    names = [
-        "StarID","P","T","e","a","Omega","omega","i","StarRef"
-    ]
+    names = ["StarID","P","T","e","a","Omega","omega","i","StarRef"]
 
     df = pd.read_fwf(
         pd.io.common.StringIO("\n".join(data_lines)),
