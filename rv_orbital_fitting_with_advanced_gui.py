@@ -165,8 +165,7 @@ def readcsv_custom(fname):
 
         # Metadata and elements
         if len(parts) == 2:
-            rawkey = parts[0].strip()
-            key = rawkey.upper()
+            key = parts[0].strip().lower()
             #print(key)  # Debug output
             val = parts[1].strip()
             if "object" in key:
