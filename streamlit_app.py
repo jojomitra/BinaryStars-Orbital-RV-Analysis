@@ -86,7 +86,7 @@ if (uploaded_file or selected_example) and run:
             sys.stdout = buffer
             sys.stderr = buffer
             try:
-                if path.endswith(".csv"):
+                if path.lower().endswith(".csv"):
                     readcsv_custom(path)
                 else:
                     readinp(path)
