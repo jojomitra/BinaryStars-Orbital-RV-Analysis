@@ -218,6 +218,9 @@ def readcsv_custom(fname):
         correct(orb.pos, orb.el[1])
 
     orb.graph['mode'] = 1 if (krv1 > 0 or krv2 > 0) else 0
+    # HM: if there are no RV data, fix K1,K2,V0 so we don’t try to fit zero‐valued steps
+    if orb.obj['nrv1']==0 and orb.obj['nrv2']==0:
+        orb.fixel[7:10] = 0
     # HM: ─── save the *initial* elements for later overlay & printing ───
     orb.initial_el = orb.el.copy()
 
