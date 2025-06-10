@@ -220,10 +220,17 @@ def readcsv_custom(fname):
     orb.graph['mode'] = 1 if (krv1 > 0 or krv2 > 0) else 0
     
     # HM: if there are no RV data, fix K1,K2,V0 so we don’t try to fit zero‐valued steps
+    print("[DBG] >>> readcsv_custom summary:")
+    print(f"  orb.el        = {orb.el}")
+    print(f"  orb.fixel     = {orb.fixel}")
+    print(f"  npos, nrv1, nrv2 = {orb.obj['npos']}, {orb.obj['nrv1']}, {orb.obj['nrv2']}")
+    
     no_rvs   = (orb.obj['nrv1'] == 0 and orb.obj['nrv2'] == 0)
     zeros_in = (orb.el[7] == 0 and orb.el[8] == 0 and orb.el[9] == 0)
+    print(f"  no_rvs? {no_rvs}, zeros_in? {zeros_in}")
     if no_rvs or zeros_in:
         orb.fixel[7:10] = 0
+    print(f"  orb.fixel after fix = {orb.fixel}")
     # HM: ─── save the *initial* elements for later overlay & printing ───
     orb.initial_el = orb.el.copy()
 
