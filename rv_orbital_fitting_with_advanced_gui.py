@@ -165,7 +165,8 @@ def readcsv_custom(fname):
 
         # Metadata and elements
         if len(parts) == 2:
-            key = parts[0].strip().lower()
+            rawkey = parts[0].strip()
+            key = rawkey.upper()
             #print(key)  # Debug output
             val = parts[1].strip()
             if "object" in key:
@@ -177,9 +178,9 @@ def readcsv_custom(fname):
             elif "par" in key:
                 orb.obj['parallax'] = float(val)
                 #print(f"DEBUG: Parallax read = {orb.obj['parallax']}")
-            elif parts[0] in orb.elname:
-                idx = orb.elname.index(parts[0])
-                orb.el[idx] = float(parts[1])
+            elif key in orb.elname:
+                idx = orb.elname.index(key)
+                orb.el[idx] = float(val)
                 orb.fixel[idx] = 1
             continue
         # RV1 (Va)
