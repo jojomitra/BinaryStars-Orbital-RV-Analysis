@@ -178,8 +178,8 @@ def readcsv_custom(fname):
             elif "par" in key:
                 orb.obj['parallax'] = float(val)
                 #print(f"DEBUG: Parallax read = {orb.obj['parallax']}")
-            elif key in orb.elname:
-                idx = orb.elname.index(key)
+            elif parts[0] in orb.elname:
+                idx = orb.elname.index(parts[0])
                 orb.el[idx] = float(parts[1])
                 orb.fixel[idx] = 1
             continue
