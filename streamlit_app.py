@@ -24,9 +24,10 @@ class StreamlitRedirect(io.StringIO):
 
 # --- Streamlit App Layout ---
 st.title("Python Implementation of Tokovinin's Binary Star ORBITX Code")
-st.markdown("""Python Implementation of Tokovinin’s original OrbitX code which helps calculate and display the orbital elements of binary star systems. 
-            This version has been improved and made more useful by 
-            Prof. Mashhoor Al-Wardat and Dr. Mohammed Hussien Talafha.
+st.markdown("""Python Implementation of Tokovinin’s original OrbitX code. 
+            This version, enhanced by Prof. Mashhoor Al-Wardat, Dr. Mohammed Hussien Talafha, Mr. Hritik Mitra, and Mr. Hassan Haboubi,
+            analyzes orbits of visual binaries (VB) using data from the 4th Catalog of Interferometric Measurements or SOAR telescope,
+            spectroscopic binaries (SB) using SB9 catalog data, or any binary system with both interferometric and spectroscopic measurements. 
             
             """)
 st.markdown("Upload a `.inp or.csv` file and run the orbital fitting process below.")
@@ -86,7 +87,7 @@ if (uploaded_file or selected_example) and run:
             sys.stdout = buffer
             sys.stderr = buffer
             try:
-                if path.lower().endswith(".csv"):
+                if path.endswith(".csv"):
                     readcsv_custom(path)
                 else:
                     readinp(path)
@@ -108,4 +109,3 @@ if (uploaded_file or selected_example) and run:
                 sys.stdout = sys.__stdout__
                 sys.stderr = sys.__stderr__
 # End Change2 Made by HM (02/06/2025)
-
