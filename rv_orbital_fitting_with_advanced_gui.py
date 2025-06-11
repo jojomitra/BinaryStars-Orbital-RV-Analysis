@@ -9,6 +9,7 @@ Original file is located at
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from scipy.optimize import least_squares
 import pandas as pd
 import os
@@ -389,8 +390,6 @@ def residual_plots():
     Residual Plots Δθ (°) and Δρ (arcsec) vs epoch, plus side boxplots.
     Using the same pos[] array and fitted orbit in orb.el.
     """
-    import matplotlib.pyplot as plt
-
     # get observation epochs and compute fitted values
     t_obs   = orb.pos[:, 0]
     res_obs = eph(orb.el, t_obs, rho=True)    # columns: [θ_fit, ρ_fit]
@@ -423,19 +422,22 @@ def residual_plots():
     ax1.axhline(0, color='k', linewidth=0.8)
     ax1.scatter(t_obs, dtheta, marker='*', s=30)
     ax1.set_ylabel(r'$\Delta\theta\,$(°)')
-    ax1.set_xlabel('Epoch (JD or year)')
+    ax1.xaxis.set_major_locator(MaxNLocator(nbins=6, integer=True))
+    ax1.set_xlabel('Epoch (year)')
 
     # boxplot of Δρ on right
     ax2 = fig.add_subplot(gs[0, 1])
     ax2.boxplot(drho, vert=True, widths=0.6)
     ax2.set_xticks([])
     ax2.set_title('ρ residuals')
+    ax2.set_ylim(ax0.get_ylim())
 
     # boxplot of Δθ on right
     ax3 = fig.add_subplot(gs[1, 1])
     ax3.boxplot(dtheta, vert=True, widths=0.6)
     ax3.set_xticks([])
     ax3.set_title('θ residuals')
+    ax3.set_ylim(ax1.get_ylim())
 
     return fig
 
