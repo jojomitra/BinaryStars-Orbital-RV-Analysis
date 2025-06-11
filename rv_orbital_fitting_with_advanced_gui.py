@@ -382,6 +382,64 @@ def orbplot_streamlit():
         figs.append(fig3)
 
     return figs
+
+def residual_plots():
+    """
+    HM: (06/11/2025)
+    Residual Plots Δθ (°) and Δρ (arcsec) vs epoch, plus side boxplots.
+    Using the same pos[] array and fitted orbit in orb.el.
+    """
+    import matplotlib.pyplot as plt
+
+    # get observation epochs and compute fitted values
+    t_obs   = orb.pos[:, 0]
+    res_obs = eph(orb.el, t_obs, rho=True)    # columns: [θ_fit, ρ_fit]
+    theta_fit, rho_fit = res_obs[:, 0], res_obs[:, 1]
+
+    # observed values
+    theta_obs = orb.pos[:, 1]    # PA in degrees
+    rho_obs   = orb.pos[:, 2]    # separation in arcsec
+
+    # residuals
+    dtheta = theta_obs - theta_fit
+    # wrap into [-180,180)
+    dtheta = (dtheta + 180) % 360 - 180
+
+    drho = rho_obs - rho_fit
+
+    # figure with 2 rows, 2 cols: left column is time series, right column boxplots
+    fig = plt.figure(figsize=(10, 6))
+    gs  = fig.add_gridspec(2, 2, width_ratios=[3,1], hspace=0.3, wspace=0.2)
+
+    # Δρ vs epoch
+    ax0 = fig.add_subplot(gs[0, 0])
+    ax0.axhline(0, color='k', linewidth=0.8)
+    ax0.scatter(t_obs, drho, marker='^', s=30)
+    ax0.set_ylabel(r'$\Delta\rho\,$(″)')
+    ax0.set_xticklabels([])   # no x‑labels on top panel
+
+    # Δθ vs epoch
+    ax1 = fig.add_subplot(gs[1, 0], sharex=ax0)
+    ax1.axhline(0, color='k', linewidth=0.8)
+    ax1.scatter(t_obs, dtheta, marker='*', s=30)
+    ax1.set_ylabel(r'$\Delta\theta\,$(°)')
+    ax1.set_xlabel('Epoch (JD or year)')
+
+    # boxplot of Δρ on right
+    ax2 = fig.add_subplot(gs[0, 1])
+    ax2.boxplot(drho, vert=True, widths=0.6)
+    ax2.set_xticks([])
+    ax2.set_title('ρ residuals')
+
+    # boxplot of Δθ on right
+    ax3 = fig.add_subplot(gs[1, 1])
+    ax3.boxplot(dtheta, vert=True, widths=0.6)
+    ax3.set_xticks([])
+    ax3.set_title('θ residuals')
+
+    return fig
+
+
 def orbplot(ps=False):
     global orb
     name = orb.obj['fname'].split('.')[0]
