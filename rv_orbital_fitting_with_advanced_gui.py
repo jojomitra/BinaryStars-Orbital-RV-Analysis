@@ -385,7 +385,7 @@ def orbplot_streamlit():
 
 def residual_plots():
     """
-    HM: (06/11/2025)
+    HM: (11/06/2025)
     Residual Plots Δθ (°) and Δρ (arcsec) vs epoch, plus side boxplots.
     Using the same pos[] array and fitted orbit in orb.el.
     """
