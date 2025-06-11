@@ -422,7 +422,8 @@ def residual_plots():
     ax1.axhline(0, color='k', linewidth=0.8)
     ax1.scatter(t_obs, dtheta, marker='*', s=30)
     ax1.set_ylabel(r'$\Delta\theta\,$(°)')
-    ax1.xaxis.set_major_locator(MaxNLocator(nbins=6, integer=True))
+    ax1.xaxis.set_major_locator(MaxNLocator(nbins=6))
+    ax1.xaxis.set_major_formatter(lambda x, pos: f"{x:.0f}")
     ax1.set_xlabel('Epoch (year)')
 
     # boxplot of Δρ on right
