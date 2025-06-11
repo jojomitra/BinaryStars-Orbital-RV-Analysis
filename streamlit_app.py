@@ -8,7 +8,7 @@ import io
 import sys
 import os
 
-from rv_orbital_fitting_with_advanced_gui import readinp, readcsv_custom, fitorb, orbsave, orbplot_streamlit, orb
+from rv_orbital_fitting_with_advanced_gui import readinp, readcsv_custom, fitorb, orbsave, orbplot_streamlit, orb, residual_plots
 
 # --- Redirect stdout to display logs ---
 class StreamlitRedirect(io.StringIO):
@@ -103,6 +103,10 @@ if (uploaded_file or selected_example) and run:
                 figs = orbplot_streamlit()
                 for fig in figs:
                     st.pyplot(fig)
+                    #HM: (11/06/2025) Added Residual Plots
+                    st.subheader("Residuals (Observed − Fitted)")
+                    fig_resid = residual_plots()
+                    st.pyplot(fig_resid)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
             finally:
